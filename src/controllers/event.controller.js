@@ -23,6 +23,8 @@ export const createEvent = asyncHandler(async (req, res) => {
         status,
     } = req.body;
 
+    console.log("📝 Creating new event:", { name, hasFile: !!req.file });
+    
     // Validate required fields
     if (!name || !description || !category || !date || !startTime || !endTime || !location || !maxSeats) {
         throw new ApiError(400, "All required fields must be provided");
@@ -47,19 +49,24 @@ export const createEvent = asyncHandler(async (req, res) => {
     // Handle poster image upload
     let posterImageUrl = null;
     if (req.file) {
+        console.log("📸 Uploading poster image to Cloudinary:", req.file.path);
         try {
             const cloudinaryResponse = await uploadonCloudinary(req.file.path, {
                 folder: "uniconnect/events",
                 resource_type: "image"
             });
             posterImageUrl = cloudinaryResponse.secure_url;
+            console.log("✅ Image uploaded successfully:", posterImageUrl);
         } catch (error) {
+            console.error("❌ Cloudinary upload failed:", error);
             // Clean up file if upload fails
             if (req.file && fs.existsSync(req.file.path)) {
                 fs.unlinkSync(req.file.path);
             }
             throw new ApiError(500, "Failed to upload poster image");
         }
+    } else {
+        console.log("ℹ️ No poster image provided");
     }
 
     // Create event
@@ -81,6 +88,8 @@ export const createEvent = asyncHandler(async (req, res) => {
 
     await event.populate('createdBy', '-password -refreshToken -emailVerificationOTP -passwordResetOTP');
 
+    console.log("✅ Event created successfully:", event._id);
+    
     res.status(201).json(
         new ApiResponse(201, event, "Event created successfully")
     );
@@ -165,6 +174,8 @@ export const updateEvent = asyncHandler(async (req, res) => {
     const { eventId } = req.params;
     const updateData = req.body;
 
+    console.log("📝 Updating event:", eventId, { hasFile: !!req.file });
+
     if (!mongoose.Types.ObjectId.isValid(eventId)) {
         throw new ApiError(400, "Invalid event ID");
     }
@@ -177,13 +188,16 @@ export const updateEvent = asyncHandler(async (req, res) => {
 
     // Handle poster image upload if provided
     if (req.file) {
+        console.log("📸 Uploading updated poster image to Cloudinary:", req.file.path);
         try {
             const cloudinaryResponse = await uploadonCloudinary(req.file.path, {
                 folder: "uniconnect/events",
                 resource_type: "image"
             });
             updateData.posterImage = cloudinaryResponse.secure_url;
+            console.log("✅ Image uploaded successfully:", updateData.posterImage);
         } catch (error) {
+            console.error("❌ Cloudinary upload failed:", error);
             // Clean up file if upload fails
             if (req.file && fs.existsSync(req.file.path)) {
                 fs.unlinkSync(req.file.path);
@@ -216,6 +230,8 @@ export const updateEvent = asyncHandler(async (req, res) => {
 
     await event.save();
     await event.populate('createdBy', 'fullName email');
+
+    console.log("✅ Event updated successfully:", event._id);
 
     res.status(200).json(
         new ApiResponse(200, event, "Event updated successfully")
