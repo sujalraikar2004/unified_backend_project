@@ -23,11 +23,26 @@ export const createEvent = asyncHandler(async (req, res) => {
         status,
     } = req.body;
 
-    console.log("📝 Creating new event:", { name, hasFile: !!req.file });
+    console.log("📝 Creating new event:", { 
+        name, 
+        hasFile: !!req.file,
+        fileDetails: req.file ? {
+            fieldname: req.file.fieldname,
+            originalname: req.file.originalname,
+            mimetype: req.file.mimetype,
+            size: req.file.size,
+            path: req.file.path
+        } : null
+    });
     
     // Validate required fields
     if (!name || !description || !category || !date || !startTime || !endTime || !location || !maxSeats) {
         throw new ApiError(400, "All required fields must be provided");
+    }
+
+    // Require poster image for new events
+    if (!req.file) {
+        throw new ApiError(400, "Poster image is required for all events");
     }
 
     // Parse category if it's a string (from form data)

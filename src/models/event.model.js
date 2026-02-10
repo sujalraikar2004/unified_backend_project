@@ -65,7 +65,7 @@ const eventSchema = new mongoose.Schema(
         },
         posterImage: {
             type: String,
-            default: null,
+            required: [true, "Event poster image is required"],
         },
         registeredTeams: [{
             team: {
