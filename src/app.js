@@ -35,6 +35,16 @@ app.use('/api/v1/gallery', galleryRouter)
 app.use('/api/v1/teams', teamRouter)
 app.use('/api/v1/events', eventRouter)
 
+// Root route
+app.get('/', (req, res) => {
+    res.status(200).json({ 
+        success: true,
+        message: 'Backend is running successfully!',
+        version: '1.0.0',
+        timestamp: new Date().toISOString()
+    })
+})
+
 // Health check route
 app.get('/health', (req, res) => {
     res.status(200).json({ status: 'OK', message: 'Server is running' })
