@@ -2,6 +2,16 @@ import { v2 as cloudinary } from "cloudinary"
 import fs from "fs"
 
 const uploadonCloudinary = async (filepath, options = {}) => {
+    // Validate file path
+    if (!filepath) {
+        throw new Error("File path is required for upload");
+    }
+
+    // Check if file exists before attempting upload
+    if (!fs.existsSync(filepath)) {
+        throw new Error(`File not found at path: ${filepath}`);
+    }
+
     // Force the correct Cloudinary configuration (override system env vars)
     const cloudinaryConfig = {
         cloud_name: "derz8ikfc",
@@ -9,10 +19,11 @@ const uploadonCloudinary = async (filepath, options = {}) => {
         api_secret: "k0ZD40fMhllYhoqqmhJXwPoKKgU"
     };
 
-    console.log("Cloudinary Config Debug:");
+    console.log("Cloudinary Upload Debug:");
+    console.log("File path:", filepath);
+    console.log("File exists:", fs.existsSync(filepath));
     console.log("Using cloud_name:", cloudinaryConfig.cloud_name);
-    console.log("Using api_key:", cloudinaryConfig.api_key);
-    console.log("Using api_secret:", cloudinaryConfig.api_secret ? "***SET***" : "NOT SET");
+    console.log("Environment:", process.env.VERCEL ? "Vercel" : "Local");
 
     cloudinary.config(cloudinaryConfig);
 
@@ -23,21 +34,36 @@ const uploadonCloudinary = async (filepath, options = {}) => {
             ...options
         };
 
+        console.log("Starting upload to Cloudinary...");
         const response = await cloudinary.uploader.upload(filepath, uploadOptions);
 
-        console.log("file uploaded to cloudinary", response.url);
+        console.log("✅ File uploaded to cloudinary:", response.url);
         
         // Clean up local file after successful upload
-        if (fs.existsSync(filepath)) {
-            fs.unlinkSync(filepath);
+        try {
+            if (fs.existsSync(filepath)) {
+                fs.unlinkSync(filepath);
+                console.log("✅ Temporary file cleaned up:", filepath);
+            }
+        } catch (cleanupError) {
+            console.error("⚠️ Error cleaning up temp file:", cleanupError);
+            // Don't throw - upload was successful
         }
         
         return response;
     } catch (error) {
+        console.error("❌ Cloudinary upload error:", error);
+        
         // Clean up local file on error
-        if (fs.existsSync(filepath)) {
-            fs.unlinkSync(filepath);
+        try {
+            if (fs.existsSync(filepath)) {
+                fs.unlinkSync(filepath);
+                console.log("🧹 Temporary file cleaned up after error");
+            }
+        } catch (cleanupError) {
+            console.error("⚠️ Error cleaning up temp file after error:", cleanupError);
         }
+        
         throw error;
     }
 }
