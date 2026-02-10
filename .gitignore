@@ -1,0 +1,34 @@
+# Dependencies
+/node_modules
+/jspm_packages
+
+# Optional npm cache files
+.npm
+
+# Certs
+certs/build/
+certs/ssl/
+
+# Diagnostics
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment files
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# TypeScript cache files
+*.tsbuildinfo
+
+# Editors and OS files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
