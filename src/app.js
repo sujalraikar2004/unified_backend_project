@@ -9,7 +9,7 @@ const app = express()
 // Configure CORS to allow frontend origin
 app.use(cors({
     credentials: true,
-    origin: ['http://localhost:8080', 'http://localhost:5173', 'http://localhost:5137', 'http://localhost:3000', 'http://localhost:4173','https://uniconnect-hub-32cac73a.vercel.app', process.env.CORS_ORIGIN],
+    origin: ['http://localhost:8080', 'http://localhost:5173', 'http://localhost:5137', 'http://localhost:3000', 'http://localhost:4173','https://uniconnect-hub-32cac73a.vercel.app','https://uniconnect-hub-chi.vercel.app', process.env.CORS_ORIGIN],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
 }))
