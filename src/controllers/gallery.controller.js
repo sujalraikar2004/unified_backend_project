@@ -79,7 +79,7 @@ const createGalleryItem = asyncHandler(async (req, res) => {
 const getAllGalleryItems = asyncHandler(async (req, res) => {
     const {
         page = 1,
-        limit = 10,
+        limit = 40,
         category,
         mediaType,
         search,
