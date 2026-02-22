@@ -50,6 +50,7 @@ export const upload = multer({
             'image/png',
             'image/gif',
             'image/webp',
+            'image/heic',
             'video/mp4',
             'video/mpeg',
             'video/quicktime'
